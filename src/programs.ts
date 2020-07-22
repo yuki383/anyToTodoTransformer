@@ -41,8 +41,6 @@ export function getProgram(searchPath: string) {
     throw new Error("parsedCommandLine has errors.");
   }
 
-  console.log(parsedCommandLine.options);
-
   const program = ts.createProgram({
     rootNames: parsedCommandLine.fileNames,
     options: parsedCommandLine.options,
