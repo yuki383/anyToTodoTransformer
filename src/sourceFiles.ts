@@ -1,11 +1,16 @@
 import * as fs from "fs";
 import ts from "typescript";
 
+/**
+ *
+ * @param program programインスタンス
+ * @param searchDir fs.readdirするディレクトリ(globに対応するかもしれない)
+ */
 export function getTargets(
   program: ts.Program,
   searchDir: string
 ): ts.SourceFile[] {
-  const files = fs.readdirSync(searchDir, { encoding: "utf-8" });
+  const files = fs.readdirSync(searchDir);
 
   const targets = files
     .map(program.getSourceFile)
