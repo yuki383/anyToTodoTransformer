@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import ts from "typescript";
 
 /**
@@ -13,7 +14,14 @@ export function getTargets(
   const files = fs.readdirSync(searchDir);
 
   const targets = files
-    .map(program.getSourceFile)
+    .map((fileName) => {
+      const filePath = path.resolve(
+        program.getCurrentDirectory(),
+        "src/targets",
+        fileName
+      );
+      return program.getSourceFile(filePath);
+    })
     .filter(required)
     .filter(hasAnyKeyword);
 
@@ -25,19 +33,21 @@ function required<T>(sourceFile: T | undefined): sourceFile is T {
 }
 
 function hasAnyKeyword(sourceFile: ts.SourceFile): boolean {
-  const hasAny = visit(sourceFile);
+  let hasAny = false;
+
+  function visit(node: ts.Node) {
+    if (ts.isTypeNode(node)) {
+      if (node.kind === ts.SyntaxKind.AnyKeyword) {
+        hasAny = true;
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+
   if (hasAny) {
     return true;
   }
   return false;
-}
-
-function visit(node: ts.Node) {
-  if (ts.isTypeNode(node)) {
-    if (node.kind === ts.SyntaxKind.AnyKeyword) {
-      return true;
-    }
-  }
-  // TODO: isEndOfFileみたいな関数見つけてvisitの返り値をbooleanにしたい
-  ts.forEachChild(node, visit);
 }
