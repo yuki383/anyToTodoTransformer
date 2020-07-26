@@ -22,7 +22,7 @@ function main() {
   }
 
   const result = ts.transform(transformTargets, [
-    // addTodoImportTransformer,
+    addTodoImportTransformer,
     anyToTodoTransFormer,
   ]);
 
