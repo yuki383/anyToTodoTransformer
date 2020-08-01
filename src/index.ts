@@ -5,20 +5,37 @@ import { getProgram } from "./programs";
 import { getTargets } from "./sourceFiles";
 import { addTodoImportTransformer } from "./addTodoImportTransformer";
 import { anyToTodoTransFormer } from "./anyToTodoTransformer";
+import { parseArgs } from "./parseArgs";
 
 function main() {
-  const rootName = process.argv[2] || path.resolve(process.cwd());
-  const searchDir = "./src/targets";
-  const program = getProgram(rootName);
+  const args = parseArgs(process.argv);
+
+  // ヘルプコマンドの場合他の処理を実行しない
+  if (process.argv.find((arg) => /-h|--help/) !== undefined) {
+    return;
+  }
+
+  if (args.todoFilePath === undefined) {
+    console.error("Invalid argument");
+    return;
+  }
+
+  const program = getProgram(args.project);
 
   // anyが含まれているSourceFileの配列を得る
   const transformTargets: ts.SourceFile[] | undefined = getTargets(
     program,
-    searchDir
+    args.todoFilePath
   );
 
   if (transformTargets === undefined) {
-    throw new Error("Invalid arguments");
+    console.error("Invalid arguments");
+    return;
+  }
+
+  if (transformTargets.length <= 0) {
+    console.error("Cannot find file include type any.")
+    return;
   }
 
   const result = ts.transform(transformTargets, [
