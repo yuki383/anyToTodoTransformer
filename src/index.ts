@@ -3,7 +3,9 @@ import * as path from "path";
 import * as ts from "typescript";
 import { getProgram } from "./programs";
 import { getTargets } from "./sourceFiles";
-import { addTodoImportTransformer } from "./addTodoImportTransformer";
+import {
+  getAddTodoImportTransformer,
+} from "./addTodoImportTransformer";
 import { anyToTodoTransFormer } from "./anyToTodoTransformer";
 import { parseArgs } from "./parseArgs";
 
@@ -34,9 +36,13 @@ function main() {
   }
 
   if (transformTargets.length <= 0) {
-    console.error("Cannot find file include type any.")
+    console.error("Cannot find file include type any.");
     return;
   }
+
+  const addTodoImportTransformer = getAddTodoImportTransformer(
+    args.todoFilePath
+  );
 
   const result = ts.transform(transformTargets, [
     addTodoImportTransformer,
