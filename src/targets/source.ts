@@ -8,6 +8,10 @@ function funcTodo(n: Todo<any>) {
 }
 
 const variable: any = foo;
+const { objectBinding1 }: { objectBinding1: any } = { objectBinding1: "hoge" };
+const { objectBinding2 }: any = { objectBinding2: "hoge" };
+const [tuplePattern]: [string, string, any] = ["one", "two", 333];
+const [ArrayPattern]: any[] = ["one", "two", 333];
 const variableTodo: Todo<any> = foo;
 
 type Mock = {
