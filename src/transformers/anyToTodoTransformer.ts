@@ -1,14 +1,9 @@
 import * as ts from "typescript";
+import { createTodoType, isAnyType } from "../utils/nodeUtils";
 
 export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   return (sourceFile: ts.SourceFile) => {
     function visitor(node: ts.Node): ts.Node {
-      if (ts.isTypeNode(node) && node.kind === ts.SyntaxKind.AnyKeyword) {
-        console.log(
-          `type: ${ts.SyntaxKind[node.kind]}, parent: ${node.parent}`
-        );
-      }
-
       if (ts.isVariableDeclaration(node) && isAnyType(node.type)) {
         const actualType = ts.createKeywordTypeNode(
           ts.SyntaxKind.NumberKeyword
@@ -40,17 +35,4 @@ export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
 
     return ts.visitEachChild(sourceFile, visitor, ctx);
   };
-}
-
-function isAnyType(type: ts.TypeNode | undefined): boolean {
-  if (type === undefined) return false;
-  if (type.kind !== ts.SyntaxKind.AnyKeyword) return false;
-
-  return true;
-}
-
-function createTodoType(genericsType: ts.TypeNode) {
-  return ts.createTypeReferenceNode(ts.createIdentifier("Todo"), [
-    genericsType,
-  ]);
 }
