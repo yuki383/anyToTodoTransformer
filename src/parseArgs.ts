@@ -25,7 +25,6 @@ export function parseArgs(argv: string[]) {
   });
 
   const parsed = cli.parse(argv);
-  console.log(parsed);
 
   const todoFilePath = parsed.args[0];
 
