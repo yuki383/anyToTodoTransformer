@@ -5,17 +5,17 @@ import { getProgram } from "./programs";
 import { getTargets } from "./sourceFiles";
 import {
   getAddTodoImportTransformer,
-} from "./addTodoImportTransformer";
-import { anyToTodoTransFormer } from "./anyToTodoTransformer";
+} from "./transformers/addTodoImportTransformer";
+import { anyToTodoTransFormer } from "./transformers/anyToTodoTransformer";
 import { parseArgs } from "./parseArgs";
 
 function main() {
   const args = parseArgs(process.argv);
 
   // ヘルプコマンドの場合他の処理を実行しない
-  if (process.argv.find((arg) => /-h|--help/) !== undefined) {
-    return;
-  }
+  // if (process.argv.find((arg) => /-h|--help/) !== undefined) {
+  //   return;
+  // }
 
   if (args.todoFilePath === undefined) {
     console.error("Invalid argument");
@@ -27,7 +27,7 @@ function main() {
   // anyが含まれているSourceFileの配列を得る
   const transformTargets: ts.SourceFile[] | undefined = getTargets(
     program,
-    args.todoFilePath
+    args.targets
   );
 
   if (transformTargets === undefined) {

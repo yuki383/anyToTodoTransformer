@@ -1,34 +1,23 @@
 import * as ts from "typescript";
-import { createTodoType, isAnyType } from "../utils/nodeUtils";
+import { isAnyType } from "../utils/nodeUtils";
+import { todoifyTypeTransformer } from "./todoifyTypeTransformer";
 
 export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   return (sourceFile: ts.SourceFile) => {
     function visitor(node: ts.Node): ts.Node {
-      if (ts.isVariableDeclaration(node) && isAnyType(node.type)) {
-        const actualType = ts.createKeywordTypeNode(
-          ts.SyntaxKind.NumberKeyword
-        );
-        const todoType = createTodoType(actualType);
+      if (ts.isVariableDeclaration(node) && node.type && isAnyType(node.type)) {
+        const transformed = ts.transform(node.type, [todoifyTypeTransformer])
+          .transformed;
+        if (transformed.length < 1) return node;
+
         const newVariableDeclaration = ts.updateVariableDeclaration(
           node,
           node.name,
-          todoType,
+          transformed[0],
           node.initializer
         );
-
         return newVariableDeclaration;
       }
-
-      //   if (ts.isTypeNode(node) && node.kind === ts.SyntaxKind.AnyKeyword) {
-      //     // TODO: 現在Todo<any>をTodo<Todo<any>>にしてしまう
-      //     // なので、parentがTodoの場合は変換しないようにする
-      //     // AnyKeywordからparentを参照するのは厳しそうなので、
-      //     // variable declarationとかから肩を判別する？
-
-      //     return ts.createTypeReferenceNode(ts.createIdentifier("Todo"), [
-      //       ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-      //     ]);
-      //   }
 
       return ts.visitEachChild(node, visitor, ctx);
     }
