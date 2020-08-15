@@ -10,12 +10,12 @@ export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   return (sourceFile: ts.SourceFile) => {
     function visitor(node: ts.Node): ts.Node {
       if (ts.isVariableDeclaration(node) && node.type) {
-        const hogehoge = hoge(node.type);
+        const converted = convertVariableType(node.type);
 
         const newVariableDeclaration = ts.updateVariableDeclaration(
           node,
           node.name,
-          hogehoge,
+          converted,
           node.initializer
         );
         return newVariableDeclaration;
@@ -28,7 +28,7 @@ export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   };
 }
 
-function hoge(node: ts.TypeNode) {
+function convertVariableType(node: ts.TypeNode) {
   if (isAnyType(node)) {
     return createTodoType(node);
   }
