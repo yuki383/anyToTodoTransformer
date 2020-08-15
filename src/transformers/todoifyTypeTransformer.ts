@@ -6,11 +6,7 @@ export function todoifyTypeTransformer(ctx: ts.TransformationContext) {
     let isTodoTypeReference = false;
 
     function visitor(node: ts.Node): ts.Node {
-      if (
-        ts.isTypeReferenceNode(node) &&
-        ts.isIdentifier(node.typeName) &&
-        node.typeName.escapedText === "Todo"
-      ) {
+      if (isTodoReference(node)) {
         isTodoTypeReference = true;
         return ts.visitEachChild(node, visitor, ctx);
       }
@@ -36,6 +32,18 @@ export function todoifyTypeTransformer(ctx: ts.TransformationContext) {
       return createTodoType(typeNode);
     }
 
+    if (isTodoReference(typeNode)) {
+      isTodoTypeReference = true;
+    }
+
     return ts.visitEachChild(typeNode, visitor, ctx);
   };
+}
+
+function isTodoReference(node: ts.Node) {
+  return (
+    ts.isTypeReferenceNode(node) &&
+    ts.isIdentifier(node.typeName) &&
+    node.typeName.escapedText === "Todo"
+  );
 }
