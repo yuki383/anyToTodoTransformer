@@ -5,7 +5,7 @@ import { todoifyTypeTransformer } from "./todoifyTypeTransformer";
 export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   return (sourceFile: ts.SourceFile) => {
     function visitor(node: ts.Node): ts.Node {
-      if (ts.isVariableDeclaration(node) && node.type && isAnyType(node.type)) {
+      if (ts.isVariableDeclaration(node) && node.type) {
         const transformed = ts.transform(node.type, [todoifyTypeTransformer])
           .transformed;
         if (transformed.length < 1) return node;
