@@ -9,16 +9,8 @@ import {
 export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   return (sourceFile: ts.SourceFile) => {
     function visitor(node: ts.Node): ts.Node {
-      if (ts.isVariableDeclaration(node) && node.type) {
-        const converted = convertVariableType(node.type);
-
-        const newVariableDeclaration = ts.updateVariableDeclaration(
-          node,
-          node.name,
-          converted,
-          node.initializer
-        );
-        return newVariableDeclaration;
+      if (ts.isTypeNode(node)) {
+        return todoify(node);
       }
 
       return ts.visitEachChild(node, visitor, ctx);
@@ -28,7 +20,7 @@ export function anyToTodoTransFormer(ctx: ts.TransformationContext) {
   };
 }
 
-function convertVariableType(node: ts.TypeNode) {
+function todoify(node: ts.TypeNode) {
   if (isAnyType(node)) {
     return createTodoType(node);
   }
